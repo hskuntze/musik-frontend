@@ -1,0 +1,18 @@
+.nav-menu {
+  height: 70px;
+  box-shadow: 0px 0px 5px 5px #1D1F99;
+  scroll-snap-align: start;
+  color: black;
+}
+
+.nav-logo {
+  width: 55px;
+  height: 55px;
+  margin: 0px 15px;
+}
+
+.nav-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+}

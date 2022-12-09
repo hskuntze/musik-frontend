@@ -1,0 +1,23 @@
+$theme-colors: (
+    'primary': #62e65f,
+    'secondary': #4345E6,
+    'danger': red,
+    'info': #E6E6E6,
+    'success': #4BB543,
+);
+
+$custom-colors: (
+    'spotify': #1db954,
+    'youtube': #c4302b,
+    'shadow': #1D1F99,
+    'dk-1': #060b0b,
+    'dk-2': #282818,
+    'dk-3': #414741,
+);
+
+$theme-colors: map-merge($theme-colors, $custom-colors);
+
+$body-bg: #4345E6;
+$body-color: #fff;
+
+@import '~bootstrap/scss/bootstrap.scss';

@@ -1,0 +1,8 @@
+.spotify-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-height: calc(100vh - 70px);
+  overflow-y: auto;
+  width: calc(100vw - 300px);
+}

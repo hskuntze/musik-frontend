@@ -1,0 +1,33 @@
+.track-container {
+  background-color: #3436B3;
+  margin: 10px 15px;
+  border-radius: 9px;
+  padding: 10px 5px;
+  width: 450px;
+  min-height: 120px;
+  transition: width 0.25s, background-color 0.5s; 
+}
+
+.track-container:hover {
+  width: 470px;
+  background-color: #6366FF;
+}
+
+.track-content {
+  text-align: center;
+  width: 430px
+}
+
+.track-common {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+}
+
+.audio-preview {
+  margin-top: 10px;
+  border-radius: 6px;
+  transition: width 1s;
+}
