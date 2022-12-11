@@ -34,6 +34,13 @@ const Home = () => {
   };
 
   useEffect(() => {
+    if (googleAuth === false) {
+      localStorage.removeItem("googleData");
+    }
+    if (spotifyAuth === false) {
+      localStorage.removeItem("spotifyData");
+    }
+
     const url = window.location.href;
     if (url.includes("?spCallback")) {
       let url = new URL(window.location.href);
@@ -50,13 +57,6 @@ const Home = () => {
       let obj = parseGoogleUrl(url);
       saveAuthGoogleData(obj);
       nav("/");
-    }
-
-    if (googleAuth === false) {
-      localStorage.removeItem("googleData");
-    }
-    if (spotifyAuth === false) {
-      localStorage.removeItem("spotifyData");
     }
   }, [nav, spotifyAuth, googleAuth]);
 

@@ -4,7 +4,7 @@ import Pagination from "../Pagination";
 import Tracks from "../Tracks";
 import "./styles.css";
 
-const Playlists = ({ playlist }) => {
+const Playlists = ({ playlist, handler }) => {
   const [activePage, setActivePage] = useState(0);
   const [show, setShow] = useState(false);
   const [tracks, setTracks] = useState({});
@@ -46,9 +46,24 @@ const Playlists = ({ playlist }) => {
 
   return (
     <div className="playlists-container">
-      <button type="button" onClick={() => handlePlaylistToggle(playlist)}>
-        {playlist.name}
-      </button>
+      <div className="playlist-header">
+        <button
+          type="button"
+          className="playlist-title-button"
+          onClick={() => handlePlaylistToggle()}
+        >
+          {playlist.name}
+        </button>
+        <label className="check-container">
+          <input
+            type="checkbox"
+            name={playlist.name}
+            id={playlist.id}
+            onClick={() => handler(playlist.id)}
+          />
+          <span className="check"></span>
+        </label>
+      </div>
       {show && playlist && (
         <>
           {tracks.items !== undefined &&
