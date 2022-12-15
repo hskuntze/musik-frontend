@@ -1,17 +1,23 @@
 import { useEffect, useState } from "react";
-import { requestToSpotify } from "../../../utils/requests";
+import { requestToSpotify, requestToYoutube } from "../../../utils/requests";
 import Playlists from "../../../components/Playlists";
 import Pagination from "../../../components/Pagination";
+import { toast } from "react-toastify";
 import "./styles.css";
 
 const Spotify = () => {
   const [user, setUser] = useState();
   const [playlists, setPlaylists] = useState();
   const [changePage, setChangePage] = useState(false);
+  const [canInsert, setCanInsert] = useState(false);
   const [activePage, setActivePage] = useState(0);
   const totalPages =
     playlists === undefined ? 0 : Math.ceil(playlists.total / playlists.limit);
   const [checkedPlaylists, setCheckedPlaylists] = useState([]);
+  const [ytPlaylists, setYtPlaylists] = useState();
+  const [tracksToTransfer, setTracksToTransfer] = useState([]);
+  const [searchedYtVideos, setSearchedYtVideos] = useState([]);
+  const [playlistToTransfer, setPlaylistToTransfer] = useState();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -62,12 +68,56 @@ const Spotify = () => {
         setChangePage(false);
       })();
     }
-  }, [user, playlists, activePage, changePage, checkedPlaylists]);
+
+    //INSERÇÃO NA PLAYLIST
+    if (canInsert) {
+      if (searchedYtVideos !== undefined) {
+        for (let i = 0; i < searchedYtVideos.length; i++) {
+          let id = searchedYtVideos[i];
+          const config = {
+            url: "playlistItems",
+            method: "POST",
+            params: {
+              part: "snippet",
+            },
+            data: {
+              snippet: {
+                playlistId: String(playlistToTransfer),
+                resourceId: {
+                  kind: "youtube#video",
+                  videoId: id,
+                },
+              },
+            },
+          };
+
+          const data = async () => {
+            try {
+              const res = await requestToYoutube(config);
+              toast.success("sucesso", res);
+            } catch (err) {
+              toast.error(err);
+            }
+          };
+        }
+      }
+
+      setCanInsert(false);
+    }
+  }, [
+    user,
+    playlists,
+    activePage,
+    changePage,
+    canInsert,
+    playlistToTransfer,
+    searchedYtVideos,
+  ]);
 
   const handlePlaylistCheck = (id) => {
     setCheckedPlaylists([...checkedPlaylists, id]);
-    if(checkedPlaylists.includes(id)){
-      setCheckedPlaylists(checkedPlaylists.filter(pl => pl !== id));
+    if (checkedPlaylists.includes(id)) {
+      setCheckedPlaylists(checkedPlaylists.filter((pl) => pl !== id));
     }
   };
 
@@ -77,7 +127,100 @@ const Spotify = () => {
   };
 
   const handleTransfer = () => {
-    console.log(checkedPlaylists);
+    const controller = new AbortController();
+
+    const config = {
+      url: "/playlists",
+      method: "GET",
+      signal: controller.signal,
+      params: {
+        part: "id,snippet",
+        mine: true,
+        maxResults: 50,
+      },
+    };
+
+    requestToYoutube(config)
+      .then((res) => {
+        setYtPlaylists(res.data);
+      })
+      .catch((err) => {
+        toast.error(err);
+      });
+
+    checkedPlaylists.forEach((item) => {
+      const config = {
+        url: `/playlists/${item}/tracks`,
+        method: "GET",
+        signal: controller.signal,
+      };
+
+      requestToSpotify(config)
+        .then((res) => {
+          res.data.items.forEach((item) => {
+            if (!tracksToTransfer.some((e) => e.track === item.track.name)) {
+              setTracksToTransfer([
+                ...tracksToTransfer,
+                tracksToTransfer.push({
+                  track: item.track.name,
+                  artists: item.track.artists,
+                }),
+              ]);
+            }
+          });
+        })
+        .catch((err) => {
+          toast.error(err);
+        });
+    });
+  };
+
+  const readArtists = (obj) => {
+    let aux = obj.artists;
+    let artists = "";
+    for (let i = 0; i < aux.length; i++) {
+      if (i === aux.length - 1) {
+        artists += aux[i].name;
+      } else {
+        artists += aux[i].name + ", ";
+      }
+    }
+    return artists;
+  };
+
+  const handleSelectPlaylist = (id) => {
+    if (playlistToTransfer === undefined) setPlaylistToTransfer(id);
+  };
+
+  const handleTransferSubmit = () => {
+    for (const obj of tracksToTransfer) {
+      if (obj.track !== undefined) {
+        let query = obj.track + " " + readArtists(obj);
+
+        let config = {
+          url: "/search",
+          method: "GET",
+          params: {
+            part: "id,snippet",
+            channelType: "any",
+            order: "viewCount",
+            type: "video",
+            q: query,
+          },
+        };
+
+        requestToYoutube(config)
+          .then((res) => {
+            let id = res.data.items[0].id.videoId;
+            setSearchedYtVideos([...searchedYtVideos, id]);
+            setCanInsert(true);
+          })
+          .catch((err) => {
+            toast.error(err);
+            console.log(err);
+          });
+      }
+    }
   };
 
   return (
@@ -87,6 +230,8 @@ const Spotify = () => {
           <button
             type="button"
             className="btn btn-primary my-2"
+            data-bs-toggle="modal"
+            data-bs-target="#transferModal"
             onClick={handleTransfer}
           >
             Transferir
@@ -104,6 +249,67 @@ const Spotify = () => {
             range={3}
             onChange={handlePageChange}
           />
+          <div
+            className="modal fade"
+            id="transferModal"
+            tabIndex="-1"
+            aria-labelledby="transferModalLabel"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-fullscreen">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h1 className="modal-title" id="transferModalLabel">
+                    Transferir músicas
+                  </h1>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  {ytPlaylists !== undefined &&
+                    ytPlaylists.items.map((item) => (
+                      <div className="playlists-container" key={item.id}>
+                        <div className="playlist-header">
+                          <div className="playlist-title-button">
+                            {item.snippet.title}
+                          </div>
+                          <label className="check-container">
+                            <input
+                              type="checkbox"
+                              name={item.snippet.name}
+                              id={item.id}
+                              onClick={() => handleSelectPlaylist(item.id)}
+                            />
+                            <span className="check"></span>
+                          </label>
+                        </div>
+                      </div>
+                    ))}
+                  <span className="modal-warning">Selecione 1 playlist</span>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => handleTransferSubmit()}
+                  >
+                    Transferir
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </>
       ) : (
         <div className="d-flex justify-content-center flex-column align-items-center mt-3">

@@ -1,6 +1,6 @@
 .sidebar-container {
   width: 300px;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 80px);
   border-right: 1px solid #1d1f99;
 }
 

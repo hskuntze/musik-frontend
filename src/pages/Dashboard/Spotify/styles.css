@@ -2,8 +2,29 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-height: calc(100vh - 70px);
+  max-height: calc(100vh - 80px);
   overflow: auto;
   width: calc(100vw - 300px);
   padding-top: 15px;
+}
+
+.modal-content {
+  background-color: #4345E6;
+}
+
+.modal-title {
+  font-size: 1.25em;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-warning {
+  margin-top: 20px;
+  color: yellowgreen;
+  font-size: 0.85em;
 }

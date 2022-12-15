@@ -1,0 +1,30 @@
+.dash-home-content {
+  display: flex;
+  max-height: calc(100vh - 80px);
+  width: calc(100vw - 300px);
+  padding-top: 50px;
+  padding-left: 50px;
+  padding-right: 50px;
+  overflow: auto;
+}
+
+.first-d-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.first-d-section img {
+  width: 40vw;
+  height: 40vh;
+  margin-bottom: 50px;
+}
+
+.first-d-section span {
+  text-align: justify;
+  text-align-last: center;
+  font-size: 1.2em;
+  letter-spacing: 0.025em;
+  width: 50vw;
+}

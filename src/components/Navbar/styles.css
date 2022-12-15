@@ -1,18 +1,31 @@
 .nav-menu {
-  height: 70px;
-  box-shadow: 0px 0px 5px 5px #1D1F99;
-  scroll-snap-align: start;
+  height: 80px;
+  box-shadow: 0px 0px 20px 7px #1d1f99;
   color: black;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.nav-menu a span {
+  display: inline-block;
+  height: 30px;
+  align-items: center;
 }
 
 .nav-logo {
-  width: 55px;
-  height: 55px;
-  margin: 0px 15px;
+  width: 65px;
+  height: 65px;
+  margin: 0px 15px 0px 50px;
 }
 
 .nav-title {
   font-size: 20px;
   font-weight: 700;
-  letter-spacing: 0.4em;
+  letter-spacing: 0.25em;
+}
+
+.link {
+  margin-left: 50px;
+  padding-top: 1px;
 }
