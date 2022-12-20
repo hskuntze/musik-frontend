@@ -4,20 +4,23 @@ import Playlists from "../../../components/Playlists";
 import Pagination from "../../../components/Pagination";
 import { toast } from "react-toastify";
 import "./styles.css";
+import { Circles } from "react-loader-spinner";
 
 const Spotify = () => {
   const [user, setUser] = useState();
   const [playlists, setPlaylists] = useState();
   const [changePage, setChangePage] = useState(false);
-  const [canInsert, setCanInsert] = useState(false);
   const [activePage, setActivePage] = useState(0);
-  const totalPages =
-    playlists === undefined ? 0 : Math.ceil(playlists.total / playlists.limit);
   const [checkedPlaylists, setCheckedPlaylists] = useState([]);
   const [ytPlaylists, setYtPlaylists] = useState();
   const [tracksToTransfer, setTracksToTransfer] = useState([]);
-  const [searchedYtVideos, setSearchedYtVideos] = useState([]);
   const [playlistToTransfer, setPlaylistToTransfer] = useState();
+  const [trasnferDone, setTransferDone] = useState(false);
+  const [transfering, setTransfering] = useState(false);
+  const totalPages =
+    playlists === undefined ? 0 : Math.ceil(playlists.total / playlists.limit);
+  var ytVideos = [];
+  var counter = 0;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -68,51 +71,7 @@ const Spotify = () => {
         setChangePage(false);
       })();
     }
-
-    //INSERÇÃO NA PLAYLIST
-    if (canInsert) {
-      if (searchedYtVideos !== undefined) {
-        for (let i = 0; i < searchedYtVideos.length; i++) {
-          let id = searchedYtVideos[i];
-          const config = {
-            url: "playlistItems",
-            method: "POST",
-            params: {
-              part: "snippet",
-            },
-            data: {
-              snippet: {
-                playlistId: String(playlistToTransfer),
-                resourceId: {
-                  kind: "youtube#video",
-                  videoId: id,
-                },
-              },
-            },
-          };
-
-          const data = async () => {
-            try {
-              const res = await requestToYoutube(config);
-              toast.success("sucesso", res);
-            } catch (err) {
-              toast.error(err);
-            }
-          };
-        }
-      }
-
-      setCanInsert(false);
-    }
-  }, [
-    user,
-    playlists,
-    activePage,
-    changePage,
-    canInsert,
-    playlistToTransfer,
-    searchedYtVideos,
-  ]);
+  }, [user, playlists, activePage, changePage]);
 
   const handlePlaylistCheck = (id) => {
     setCheckedPlaylists([...checkedPlaylists, id]);
@@ -192,6 +151,41 @@ const Spotify = () => {
     if (playlistToTransfer === undefined) setPlaylistToTransfer(id);
   };
 
+  const addVideo = (video) => {
+    const config = {
+      url: "playlistItems",
+      method: "POST",
+      params: {
+        part: "snippet",
+      },
+      data: {
+        snippet: {
+          playlistId: String(playlistToTransfer),
+          resourceId: {
+            kind: "youtube#video",
+            videoId: video,
+          },
+        },
+      },
+    };
+
+    requestToYoutube(config);
+  };
+
+  const insertLoop = (video) => {
+    setTransfering(true);
+    addVideo(video);
+    setTimeout(() => {
+      counter++;
+      if (counter < ytVideos.length) {
+        insertLoop(ytVideos[counter]);
+      } else {
+        setTransfering(false);
+        setTransferDone(true);
+      }
+    }, 3000);
+  };
+
   const handleTransferSubmit = () => {
     for (const obj of tracksToTransfer) {
       if (obj.track !== undefined) {
@@ -212,8 +206,7 @@ const Spotify = () => {
         requestToYoutube(config)
           .then((res) => {
             let id = res.data.items[0].id.videoId;
-            setSearchedYtVideos([...searchedYtVideos, id]);
-            setCanInsert(true);
+            ytVideos.push(id);
           })
           .catch((err) => {
             toast.error(err);
@@ -221,6 +214,7 @@ const Spotify = () => {
           });
       }
     }
+    insertLoop(ytVideos[0]);
   };
 
   return (
@@ -269,44 +263,83 @@ const Spotify = () => {
                     aria-label="Close"
                   ></button>
                 </div>
-                <div className="modal-body">
-                  {ytPlaylists !== undefined &&
-                    ytPlaylists.items.map((item) => (
-                      <div className="playlists-container" key={item.id}>
-                        <div className="playlist-header">
-                          <div className="playlist-title-button">
-                            {item.snippet.title}
-                          </div>
-                          <label className="check-container">
-                            <input
-                              type="checkbox"
-                              name={item.snippet.name}
-                              id={item.id}
-                              onClick={() => handleSelectPlaylist(item.id)}
-                            />
-                            <span className="check"></span>
-                          </label>
-                        </div>
+                {transfering ? (
+                  <div className="d-flex justify-content-center align-items-center my-auto">
+                    <Circles
+                      height="80"
+                      width="80"
+                      color="#62e65f"
+                      ariaLabel="circles-loading"
+                      wrapperStyle={{}}
+                      wrapperClass=""
+                      visible={true}
+                    />
+                  </div>
+                ) : (
+                  <>
+                    {trasnferDone ? (
+                      <div className="d-flex justify-content-center align-items-center my-auto">
+                        Sucesso!
                       </div>
-                    ))}
-                  <span className="modal-warning">Selecione 1 playlist</span>
-                </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={() => handleTransferSubmit()}
-                  >
-                    Transferir
-                  </button>
-                </div>
+                    ) : (
+                      <div className="modal-body">
+                        {ytPlaylists !== undefined &&
+                          ytPlaylists.items.map((item) => (
+                            <div className="playlists-container" key={item.id}>
+                              <div className="playlist-header">
+                                <div className="playlist-title-button">
+                                  {item.snippet.title}
+                                </div>
+                                <label className="check-container">
+                                  <input
+                                    type="checkbox"
+                                    name={item.snippet.name}
+                                    id={item.id}
+                                    onClick={() =>
+                                      handleSelectPlaylist(item.id)
+                                    }
+                                  />
+                                  <span className="check"></span>
+                                </label>
+                              </div>
+                            </div>
+                          ))}
+                        <span className="modal-warning">
+                          Selecione 1 playlist
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="modal-footer">
+                      {trasnferDone ? (
+                        <button
+                          type="button"
+                          className="btn btn-success"
+                          data-bs-dismiss="modal"
+                        >
+                          <i className="bi bi-check-lg" />
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            className="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                          >
+                            Cancelar
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={() => handleTransferSubmit()}
+                          >
+                            Transferir
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
