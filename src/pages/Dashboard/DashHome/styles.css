@@ -1,10 +1,11 @@
 .dash-home-content {
   display: flex;
+  flex-direction: column;
   max-height: calc(100vh - 80px);
   width: calc(100vw - 300px);
-  padding-top: 50px;
-  padding-left: 50px;
-  padding-right: 50px;
+  padding-top: 30px;
+  padding-left: 30px;
+  padding-right: 30px;
   overflow: auto;
 }
 
@@ -13,18 +14,19 @@
   flex-direction: column;
   align-items: center;
   flex: 1;
+  margin-bottom: 30px;
 }
 
 .first-d-section img {
-  width: 40vw;
-  height: 40vh;
-  margin-bottom: 50px;
+  width: 30vw;
+  height: 30vh;
+  margin-bottom: 20px;
 }
 
 .first-d-section span {
   text-align: justify;
   text-align-last: center;
   font-size: 1.2em;
-  letter-spacing: 0.025em;
+  letter-spacing: 0.015em;
   width: 50vw;
 }

@@ -3,11 +3,12 @@ import { requestToSpotify, requestToYoutube } from "../../../utils/requests";
 import Playlists from "../../../components/Playlists";
 import Pagination from "../../../components/Pagination";
 import { toast } from "react-toastify";
-import "./styles.css";
 import { Circles } from "react-loader-spinner";
+import { cacheResponse, getCachedResponse } from "../../../utils/data";
+import "./styles.css";
 
 const Spotify = () => {
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(getCachedResponse("spotifyUserData"));
   const [playlists, setPlaylists] = useState();
   const [changePage, setChangePage] = useState(false);
   const [activePage, setActivePage] = useState(0);
@@ -17,14 +18,14 @@ const Spotify = () => {
   const [playlistToTransfer, setPlaylistToTransfer] = useState();
   const [trasnferDone, setTransferDone] = useState(false);
   const [transfering, setTransfering] = useState(false);
-  const totalPages =
-    playlists === undefined ? 0 : Math.ceil(playlists.total / playlists.limit);
+  const totalPages = playlists === undefined ? 0 : Math.ceil(playlists.total / playlists.limit);
   var ytVideos = [];
   var counter = 0;
+  //var timeLeft = 0;
 
   useEffect(() => {
     const controller = new AbortController();
-    if (user === undefined) {
+    if (user === null) {
       (async () => {
         const config = {
           url: "/me",
@@ -34,6 +35,7 @@ const Spotify = () => {
 
         const data = (await requestToSpotify(config)).data;
         setUser(data);
+        cacheResponse("spotifyUserData", data);
       })();
     }
 
@@ -151,6 +153,12 @@ const Spotify = () => {
     if (playlistToTransfer === undefined) setPlaylistToTransfer(id);
   };
 
+  // const updateTimeLeft = () => {
+  //   setInterval(() => {
+  //     timeLeft -= 1;
+  //   }, 1000);
+  // }
+
   const addVideo = (video) => {
     const config = {
       url: "playlistItems",
@@ -197,7 +205,7 @@ const Spotify = () => {
           params: {
             part: "id,snippet",
             channelType: "any",
-            order: "viewCount",
+            order: "title",
             type: "video",
             q: query,
           },
@@ -210,7 +218,6 @@ const Spotify = () => {
           })
           .catch((err) => {
             toast.error(err);
-            console.log(err);
           });
       }
     }
@@ -264,7 +271,7 @@ const Spotify = () => {
                   ></button>
                 </div>
                 {transfering ? (
-                  <div className="d-flex justify-content-center align-items-center my-auto">
+                  <div className="d-flex flex-column justify-content-center align-items-center my-auto">
                     <Circles
                       height="80"
                       width="80"

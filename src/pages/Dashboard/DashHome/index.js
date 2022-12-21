@@ -1,5 +1,6 @@
 import "./styles.css";
 import FirstImg from "../../../assets/images/Listening.svg";
+import LoginSection from "../../../components/LoginSection";
 
 const DashHome = () => {
   return (
@@ -13,6 +14,7 @@ const DashHome = () => {
           dolore nesciunt vel quia quisquam doloremque nihil placeat facere.
         </span>
       </div>
+      <LoginSection />
     </div>
   );
 };

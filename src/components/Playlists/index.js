@@ -7,8 +7,8 @@ import "./styles.css";
 const Playlists = ({ playlist, handler }) => {
   const [activePage, setActivePage] = useState(0);
   const [show, setShow] = useState(false);
-  const [tracks, setTracks] = useState({});
-  const totalPages = Math.ceil(tracks.total / tracks.limit);
+  const [tracks, setTracks] = useState();
+  const totalPages = tracks === undefined ? 0 : Math.ceil(tracks.total / tracks.limit);
 
   const handlePageChange = (pageNumber) => {
     setActivePage(pageNumber);
