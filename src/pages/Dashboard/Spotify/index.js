@@ -21,7 +21,6 @@ const Spotify = () => {
   const totalPages = playlists === undefined ? 0 : Math.ceil(playlists.total / playlists.limit);
   var ytVideos = [];
   var counter = 0;
-  //var timeLeft = 0;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -39,7 +38,7 @@ const Spotify = () => {
       })();
     }
 
-    if (user !== undefined && playlists === undefined) {
+    if (user !== null && playlists === undefined) {
       (async () => {
         const config = {
           url: `/users/${user.id}/playlists`,
@@ -73,7 +72,7 @@ const Spotify = () => {
         setChangePage(false);
       })();
     }
-  }, [user, playlists, activePage, changePage]);
+  }, [user, playlists, activePage, changePage, transfering, ytVideos.length]);
 
   const handlePlaylistCheck = (id) => {
     setCheckedPlaylists([...checkedPlaylists, id]);
@@ -153,12 +152,6 @@ const Spotify = () => {
     if (playlistToTransfer === undefined) setPlaylistToTransfer(id);
   };
 
-  // const updateTimeLeft = () => {
-  //   setInterval(() => {
-  //     timeLeft -= 1;
-  //   }, 1000);
-  // }
-
   const addVideo = (video) => {
     const config = {
       url: "playlistItems",
@@ -182,7 +175,9 @@ const Spotify = () => {
 
   const insertLoop = (video) => {
     setTransfering(true);
+
     addVideo(video);
+
     setTimeout(() => {
       counter++;
       if (counter < ytVideos.length) {
@@ -205,7 +200,7 @@ const Spotify = () => {
           params: {
             part: "id,snippet",
             channelType: "any",
-            order: "title",
+            order: "rating",
             type: "video",
             q: query,
           },
@@ -221,6 +216,7 @@ const Spotify = () => {
           });
       }
     }
+
     insertLoop(ytVideos[0]);
   };
 
