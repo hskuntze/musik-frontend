@@ -18,7 +18,8 @@ const Spotify = () => {
   const [playlistToTransfer, setPlaylistToTransfer] = useState();
   const [trasnferDone, setTransferDone] = useState(false);
   const [transfering, setTransfering] = useState(false);
-  const totalPages = playlists === undefined ? 0 : Math.ceil(playlists.total / playlists.limit);
+  const totalPages =
+    playlists === undefined ? 0 : Math.ceil(playlists.total / playlists.limit);
   var ytVideos = [];
   var counter = 0;
 
@@ -180,7 +181,8 @@ const Spotify = () => {
 
     setTimeout(() => {
       counter++;
-      if (counter < ytVideos.length) {
+      //                               fator limitante
+      if (counter < ytVideos.length || counter < 15) {
         insertLoop(ytVideos[counter]);
       } else {
         setTransfering(false);
@@ -200,7 +202,7 @@ const Spotify = () => {
           params: {
             part: "id,snippet",
             channelType: "any",
-            order: "rating",
+            order: "relevance",
             type: "video",
             q: query,
           },
@@ -224,6 +226,27 @@ const Spotify = () => {
     <div className="spotify-content">
       {user !== undefined ? (
         <>
+          <div
+            className="alert alert-warning alert-dismissible fade show spotify-dash-alert"
+            role="alert"
+          >
+            <strong>Atenção:</strong> Por razões definidas pela API do YouTube a
+            transferência está limitada a 15 faixas por playlist e apenas uma
+            playlist, sendo assim uma aplicação de demonstração.{" "}
+            <a
+              href="https://developers.google.com/youtube/v3/guides/quota_and_compliance_audits"
+              rel="noreferrer"
+              target={"_blank"}
+            >
+              <strong>Saiba mais.</strong>
+            </a>
+            <button
+              type="button"
+              className="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            ></button>
+          </div>
           <button
             type="button"
             className="btn btn-primary my-2"
@@ -277,6 +300,9 @@ const Spotify = () => {
                       wrapperClass=""
                       visible={true}
                     />
+                    <span className="mt-4 mx-auto">
+                      Isso pode levar um tempo...
+                    </span>
                   </div>
                 ) : (
                   <>

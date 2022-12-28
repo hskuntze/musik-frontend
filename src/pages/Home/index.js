@@ -8,6 +8,20 @@ import LoginSection from "../../components/LoginSection";
 const Home = () => {
   return (
     <div className="home-container">
+      <div
+        className="mx-auto mt-4 text-center w-50 alert alert-warning alert-dismissible fade show"
+        role="alert"
+        style={{ fontSize: "15px" }}
+      >
+        <strong>Atenção:</strong> Aplicação em desenvolvimento. É possível
+        relatar bugs e sugestões em: kuntzedevprojects@gmail.com
+        <button
+          type="button"
+          className="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
       <div className="section home-section">
         <img src={FirstImg} alt="Escutando música" className="home-img" />
         <span className="home-text">
