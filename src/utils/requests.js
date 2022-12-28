@@ -4,10 +4,10 @@ import { getAuthGoogleData, getAuthSpotifyData } from "./data";
 import ytCredentials from "../assets/credentials/youtube_api_credentials.json";
 import { makeString } from "./functions";
 
-export const GG_REDIRECT_URI = process.env.GG_REDIRECT_URI ?? "http://localhost:3000/?ggCallback";
-export const SP_REDIRECT_URI = process.env.SP_REDIRECT_URI ?? "http://localhost:3000/?spCallback";
-export const CLIENT_ID = "8292030a3e2a41a0bab006e564f27489";
-const CLIENT_SECRET = "f45ba53466bd4850bfb6589e87d73c6a";
+export const GG_REDIRECT_URI = process.env.REACT_APP_GG_REDIRECT ?? "http://localhost:3000/?ggCallback";
+export const SP_REDIRECT_URI = process.env.REACT_APP_SP_REDIRECT ?? "http://localhost:3000/?spCallback";
+export const CLIENT_ID = process.env.REACT_APP_CLIENT_ID ?? "8292030a3e2a41a0bab006e564f27489";
+const CLIENT_SECRET = process.env.REACT_APP_CLIENT_SECRET ?? "f45ba53466bd4850bfb6589e87d73c6a";
 const SPOTIFY_ACCOUNTS_URL = "https://accounts.spotify.com";
 const SPOTIFY_API_URL = "https://api.spotify.com/v1";
 const GOOGLE_ACCOUNTS_URL = ytCredentials.web.auth_uri+"?";
