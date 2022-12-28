@@ -4,8 +4,8 @@ import { getAuthGoogleData, getAuthSpotifyData } from "./data";
 import ytCredentials from "../assets/credentials/youtube_api_credentials.json";
 import { makeString } from "./functions";
 
-export const GG_REDIRECT_URI = "http://localhost:3000/?ggCallback";
-export const SP_REDIRECT_URI = "http://localhost:3000/?spCallback";
+export const GG_REDIRECT_URI = process.env.GG_REDIRECT_URI ?? "http://localhost:3000/?ggCallback";
+export const SP_REDIRECT_URI = process.env.SP_REDIRECT_URI ?? "http://localhost:3000/?spCallback";
 export const CLIENT_ID = "8292030a3e2a41a0bab006e564f27489";
 const CLIENT_SECRET = "f45ba53466bd4850bfb6589e87d73c6a";
 const SPOTIFY_ACCOUNTS_URL = "https://accounts.spotify.com";
@@ -69,7 +69,7 @@ export const redirectionGoogleUrl = () => {
   var aux = qs.stringify({
     client_id: ytCredentials.web.client_id,
     response_type: 'token',
-    redirect_uri: ytCredentials.web.redirect_uris[1],
+    redirect_uri: GG_REDIRECT_URI,
     scope: "https://www.googleapis.com/auth/youtube.force-ssl",
     include_granted_scopes: true,
     state: "pass-through value"
